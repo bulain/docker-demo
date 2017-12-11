@@ -1,0 +1,79 @@
+version: '3'
+services: 
+    tomcat0:
+        image: tomcat:8.0.45
+        volumes:
+            - ./tomcat0:/usr/local/tomcat/webapps
+    tomcat1:
+        image: tomcat:8.0.45
+        volumes:
+            - ./tomcat1:/usr/local/tomcat/webapps
+    tomcat2:
+        image: tomcat:8.0.45
+        volumes:
+            - ./tomcat2:/usr/local/tomcat/webapps
+    nginx0: 
+        image: nginx:1.12.2
+        volumes:
+            - ./nginx:/etc/nginx/conf.d:ro
+            - ./nginx0:/usr/share/nginx/html:ro
+        links:
+            - tomcat0
+            - tomcat1
+            - tomcat2
+    nginx1: 
+        image: nginx:1.12.2
+        volumes:
+            - ./nginx:/etc/nginx/conf.d:ro
+            - ./nginx1:/usr/share/nginx/html:ro
+        links:
+            - tomcat0
+            - tomcat1
+            - tomcat2
+
+    nginx2: 
+        image: nginx:1.12.2
+        volumes:
+            - ./nginx:/etc/nginx/conf.d:ro
+            - ./nginx2:/usr/share/nginx/html:ro
+        links:
+            - tomcat0
+            - tomcat1
+            - tomcat2
+    haproxy:
+        image: haproxy:1.8.1
+        volumes:
+            - ./haproxy:/haproxy-override
+            - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+        links:
+            - nginx0
+            - nginx1
+        ports:
+            - 80:80
+            - 70:70
+        expose:
+            - 80
+            - 70
+    mysql:
+        image: mysql:5.7.20
+        environment:
+            - MYSQL_ROOT_PASSWORD=password
+    mediawiki:
+        image: synctree/mediawiki:1.24
+        ports:
+            - 82:80
+        links:
+            - mysql
+        environment:
+            - MEDIAWIKI_DB_PASSWORD=password
+            - MYSQL_PORT_3306_TCP=mysql:3306
+        volumes:
+            - ./mediawiki\LocalSettings.php:/var/www/html/LocalSettings.php
+    wordpress:
+        image: wordpress:v4.7.3
+        ports:
+            - 81:80
+        links:
+            - mysql
+        environment:
+            - WORDPRESS_DB_PASSWORD=password
