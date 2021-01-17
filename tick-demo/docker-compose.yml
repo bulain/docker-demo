@@ -74,7 +74,7 @@ services:
       - 3000:3000
   
   nginx:
-    image: nginx:1.19
+    image: nginx:1.18
     container_name: tick_nginx
     restart: always
     depends_on:
