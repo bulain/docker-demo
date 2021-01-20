@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+
+  oracle:
+    image: jaspeen/oracle-xe-11g
+    container_name: tick_oracle
+    restart: always
+    privileged: true
+    networks: 
+      - tick
+    volumes:
+      - ./oracle-xe-11g:/u01/app/oracle jaspeen/oracle-xe-11g
+    ports:
+      - 15210:1521
+
+networks: 
+  tick:
+    external: false
+    
